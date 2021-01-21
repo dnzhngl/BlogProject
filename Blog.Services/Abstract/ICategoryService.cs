@@ -18,7 +18,9 @@ namespace Blog.Services.Abstract
 
         Task<IDataResult<CategoryDto>> Add(CategoryAddDto categoryAddDto, string createdByName);
         Task<IDataResult<CategoryDto>> Update(CategoryUpdateDto categoryUpdateDto, string modifiedByName);
-        Task<IResult> Delete(int categoryId, string modifiedByName);   //isDeleted değiştirilir
+        Task<IDataResult<CategoryDto>> Delete(int categoryId, string modifiedByName);   //isDeleted değiştirilir
         Task<IResult> HardDelete(int categoryId);   //veritabanından silmek için
+
+        Task<IDataResult<CategoryUpdateDto>> GetCategoryUpdateDto(int categoryId); //CategoryUpdate için CategoryUpdateDto türünde return yapacak
     }
 }

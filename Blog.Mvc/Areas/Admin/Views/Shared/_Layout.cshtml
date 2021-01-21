@@ -7,7 +7,7 @@
     <meta name="description" content="" />
     <meta name="author" content="" />
     <title>@ViewBag.Title - Admin Paneli - Blog</title>
-   @await Html.PartialAsync("_LayoutCssPartial");
+   @await Html.PartialAsync("_LayoutCssPartial")
 </head>
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
@@ -35,7 +35,7 @@
         </ul>
     </nav>
     <div id="layoutSidenav">
-      @await Html.PartialAsync("_LayoutSideBarNavPartial");
+      @await Html.PartialAsync("_LayoutSideBarNavPartial")
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid">
@@ -55,7 +55,7 @@
             </footer>
         </div>
     </div>
-    @await Html.PartialAsync("_LayoutJsPartial");
-    @await RenderSectionAsync("Scripts", false);
+    @await Html.PartialAsync("_LayoutJsPartial")
+    @await RenderSectionAsync("Scripts", false)
 </body>
 </html>

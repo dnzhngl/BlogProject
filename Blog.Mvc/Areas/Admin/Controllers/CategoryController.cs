@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Blog.Mvc.Areas.Admin.Controllers
 {
@@ -21,11 +22,15 @@ namespace Blog.Mvc.Areas.Admin.Controllers
         {
             _categoryService = categoryService;
         }
+
+
         public async Task<IActionResult> Index()
         {
-            var result = await _categoryService.GetAll();
+            var result = await _categoryService.GetAllByNonDeleted();
             return View(result.Data);
         }
+
+
         [HttpGet]
         public IActionResult Add()
         {
@@ -59,6 +64,58 @@ namespace Blog.Mvc.Areas.Admin.Controllers
                 CategoryAddPartial = await this.RenderViewToStringAsync("_CategoryAddPartial", categoryAddDto)
             });
             return Json(categoryAddAjaxErrorModel);
+        }
+
+        public async Task<JsonResult> GetAllCategories()
+        {
+            var result = await _categoryService.GetAllByNonDeleted();
+            var categories = JsonSerializer.Serialize(result.Data, new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve
+            });
+            return Json(categories);
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> Delete(int categoryId) //CategoryId Jquery ile post ettiğimizde butona vermiş olduğumuz data-id attributeu sayesinde buraya gönderilecek.
+        {
+            var result = await _categoryService.Delete(categoryId, "dnzhngl");
+            var deletedCategory = JsonSerializer.Serialize(result.Data);
+            return Json(deletedCategory);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> Update(int categoryId)
+        {
+            var result = await _categoryService.GetCategoryUpdateDto(categoryId);
+            if (result.ResultStatus == ResultStatus.Success)
+            {
+                return PartialView("_CategoryUpdatePartial", result.Data);
+            }
+            return NotFound();
+        }
+        [HttpPost]
+        public async Task<IActionResult> Update(CategoryUpdateDto categoryUpdateDto)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _categoryService.Update(categoryUpdateDto, "dnzhngl");
+                if (result.ResultStatus == ResultStatus.Success)
+                {
+                    var categoryUpdateAjaxModel = JsonSerializer.Serialize(new CategoryUpdateAjaxViewModel
+                    {
+                        CategoryDto = result.Data,
+                        CategoryUpdatePartial = await this.RenderViewToStringAsync("_CategoryUpdatePartial", categoryUpdateDto)
+                    });
+                    return Json(categoryUpdateAjaxModel);
+                }
+            }
+            var categoryUpdateAjaxErrorModel = JsonSerializer.Serialize(new CategoryUpdateAjaxViewModel
+            {
+                CategoryUpdatePartial = await this.RenderViewToStringAsync("_CategoryUpdatePartial", categoryUpdateDto)
+            });
+            return Json(categoryUpdateAjaxErrorModel);
         }
     }
 }
