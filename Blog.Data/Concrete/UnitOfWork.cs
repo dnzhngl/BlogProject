@@ -15,8 +15,10 @@ namespace Blog.Data.Concrete
         private EfArticleRepository _articleRepo;
         private EfCategoryRepository _categoryRepo;
         private EfCommentRepository _commentRepo;
-        private EfRoleRepository _roleRepo;
-        private EfUserRepository _userRepo;
+
+        // .NET Core Identity Yapısını projemize dahil ettiğimiz için kendi oluşturduğumuz role ve user yapılarına ihtiyacımız kalmadı.
+        //private EfRoleRepository _roleRepo;
+        //private EfUserRepository _userRepo;
 
         public UnitOfWork(BlogContext context)
         {
@@ -29,9 +31,9 @@ namespace Blog.Data.Concrete
 
         public ICommentRepository Comments => _commentRepo ?? new EfCommentRepository(_context);
 
-        public IRoleRepository Roles => _roleRepo ?? new EfRoleRepository(_context);
-
-        public IUserRepository Users => _userRepo ?? new EfUserRepository(_context);
+        // .NET Core Identity Yapısını projemize dahil ettiğimiz için kendi oluşturduğumuz bu yapılara ihtiyacımız kalmadı.
+        //public IRoleRepository Roles => _roleRepo ?? new EfRoleRepository(_context);
+        //public IUserRepository Users => _userRepo ?? new EfUserRepository(_context);
 
         public async ValueTask DisposeAsync()
         {

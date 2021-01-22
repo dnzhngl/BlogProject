@@ -10,10 +10,10 @@ using System.Threading.Tasks;
 
 namespace Blog.Data.Concrete.EntityFramework.Repositories
 {
-    public class EfRoleRepository : EfEntityRepositoryBase<Role>, IRoleRepository
-    {
-        public EfRoleRepository(DbContext context) : base(context)
-        {
-        }
-    }
+    //public class EfRoleRepository : EfEntityRepositoryBase<Role>, IRoleRepository
+    //{
+    //    public EfRoleRepository(DbContext context) : base(context)
+    //    {
+    //    }
+    //}
 }

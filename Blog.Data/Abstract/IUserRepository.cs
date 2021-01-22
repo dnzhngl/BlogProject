@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Blog.Data.Abstract
 {
-    public interface IUserRepository : IEntityRepository<User>
-    {
-    }
+    //public interface IUserRepository : IEntityRepository<User>
+    //{
+    //}
 }
