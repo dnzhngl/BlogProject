@@ -15,17 +15,17 @@ namespace Blog.Entities.Dtos
 
         [DisplayName("Kategori Adı")]
         [Required(ErrorMessage = "{0} boş bırakılmamalıdır.")]
-        [MaxLength(70, ErrorMessage = "{0} {1} karakterden büyük olamamalıdır.")]
+        [MaxLength(70, ErrorMessage = "{0} {1} karakterden fazla olamamalıdır.")]
         [MinLength(3, ErrorMessage = "{0} {1} karakterden az olamamalıdır.")]
         public string Name { get; set; }
 
         [DisplayName("Kategori Açıklaması")]
-        [MaxLength(500, ErrorMessage = "{0} {1} karakterden büyük olamamalıdır.")]
+        [MaxLength(500, ErrorMessage = "{0} {1} karakterden fazla olamamalıdır.")]
         [MinLength(3, ErrorMessage = "{0} {1} karakterden az olamamalıdır.")]
         public string Description { get; set; }
 
         [DisplayName("Kategori Özel Not Alanı")]
-        [MaxLength(70, ErrorMessage = "{0} {1} karakterden büyük olamamalıdır.")]
+        [MaxLength(70, ErrorMessage = "{0} {1} karakterden fazla olamamalıdır.")]
         [MinLength(3, ErrorMessage = "{0} {1} karakterden az olamamalıdır.")]
         public string Note { get; set; }
 

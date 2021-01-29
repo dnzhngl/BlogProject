@@ -1,4 +1,5 @@
 ﻿using Blog.Entities.Concrete;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -105,7 +106,46 @@ namespace Blog.Data.Concrete.EntityFramework.Mappings
             builder.HasMany<UserRole>().WithOne().HasForeignKey(ur => ur.UserId).IsRequired();
 
 
+            // Fluent API ile user ekleme
+            var adminUser = new User
+            {
+                Id = 1,
+                UserName = "adminuser",
+                NormalizedUserName = "ADMINUSER",
+                Email = "adminuser@gmail.com",
+                NormalizedEmail = "ADMINUSER@GMAIL.COM",
+                PhoneNumber = "+905555555555",
+                Picture = "defaultUser.png",
+                EmailConfirmed = true,
+                PhoneNumberConfirmed = true,
+                SecurityStamp = Guid.NewGuid().ToString() // Güvenlik değeri
+            };
+            adminUser.PasswordHash = CreatePasswordHash(adminUser, "adminuser");
 
+            var editorUser = new User
+            {
+                Id = 2,
+                UserName = "editoruser",
+                NormalizedUserName = "EDITORUSER",
+                Email = "editoruser@gmail.com",
+                NormalizedEmail = "EDITORUSER@GMAIL.COM",
+                PhoneNumber = "+905555555555",
+                Picture = "defaultUser.png",
+                EmailConfirmed = true,
+                PhoneNumberConfirmed = true,
+                SecurityStamp = Guid.NewGuid().ToString() // Güvenlik değeri
+            };
+            editorUser.PasswordHash = CreatePasswordHash(editorUser, "editoruser");
+
+
+            builder.HasData(adminUser, editorUser); //Veritabanında herhangi bir data  bulunmuyorsa vermiş olduğumuz veriler eklenir.
         }
+
+        private string CreatePasswordHash(User user, string password)
+        {
+            var passwordHasher = new PasswordHasher<User>();
+            return passwordHasher.HashPassword(user, password);  // Şifreyi kullanıcı adı olarak veriyoruz.
+        }
+
     }
 }

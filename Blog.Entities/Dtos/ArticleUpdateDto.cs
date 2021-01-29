@@ -14,7 +14,7 @@ namespace Blog.Entities.Dtos
         public int Id { get; set; }
         [DisplayName("Başlık")]
         [Required(ErrorMessage = "{0} alanı boş geçilmemelidir.")]
-        [MaxLength(100, ErrorMessage = "{0} alanı {1} karakterden büyük olmamalıdır.")]
+        [MaxLength(100, ErrorMessage = "{0} alanı {1} karakterden fazla olmamalıdır.")]
         [MinLength(5, ErrorMessage = "{0} alanı {1} karakterden az olmamalıdır.")]
         public string Title { get; set; }
 
@@ -25,7 +25,7 @@ namespace Blog.Entities.Dtos
 
         [DisplayName("Thumbnail")]
         [Required(ErrorMessage = "{0} alanı boş geçilmemelidir.")]
-        [MaxLength(250, ErrorMessage = "{0} alanı {1} karakterden büyük olmamalıdır.")]
+        [MaxLength(250, ErrorMessage = "{0} alanı {1} karakterden fazla olmamalıdır.")]
         [MinLength(5, ErrorMessage = "{0} alanı {1} karakterden az olmamalıdır.")]
         public string Thumbnail { get; set; }
 
@@ -36,19 +36,19 @@ namespace Blog.Entities.Dtos
 
         [DisplayName("Seo Yazar")]
         [Required(ErrorMessage = "{0} alanı boş geçilmemelidir.")]
-        [MaxLength(50, ErrorMessage = "{0} alanı {1} karakterden büyük olmamalıdır.")]
+        [MaxLength(50, ErrorMessage = "{0} alanı {1} karakterden fazla olmamalıdır.")]
         [MinLength(3, ErrorMessage = "{0} alanı {1} karakterden az olmamalıdır.")]
         public string SeoAuthor { get; set; }
 
         [DisplayName("Seo Açıklama")]
         [Required(ErrorMessage = "{0} alanı boş geçilmemelidir.")]
-        [MaxLength(150, ErrorMessage = "{0} alanı {1} karakterden büyük olmamalıdır.")]
+        [MaxLength(150, ErrorMessage = "{0} alanı {1} karakterden fazla olmamalıdır.")]
         [MinLength(3, ErrorMessage = "{0} alanı {1} karakterden az olmamalıdır.")]
         public string SeoDescription { get; set; }
 
         [DisplayName("Seo Etiketler")]
         [Required(ErrorMessage = "{0} alanı boş geçilmemelidir.")]
-        [MaxLength(70, ErrorMessage = "{0} alanı {1} karakterden büyük olmamalıdır.")]
+        [MaxLength(70, ErrorMessage = "{0} alanı {1} karakterden fazla olmamalıdır.")]
         [MinLength(3, ErrorMessage = "{0} alanı {1} karakterden az olmamalıdır.")]
         public string SeoTags { get; set; }
 

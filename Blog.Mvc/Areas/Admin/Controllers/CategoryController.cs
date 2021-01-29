@@ -10,10 +10,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Blog.Mvc.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "Admin, Editor")]
     public class CategoryController : Controller
     {
         private readonly ICategoryService _categoryService;
@@ -83,7 +85,6 @@ namespace Blog.Mvc.Areas.Admin.Controllers
             var deletedCategory = JsonSerializer.Serialize(result.Data);
             return Json(deletedCategory);
         }
-
 
         [HttpGet]
         public async Task<IActionResult> Update(int categoryId)

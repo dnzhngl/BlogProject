@@ -19,7 +19,21 @@ namespace Blog.Services.Extensions
         {
             serviceCollection.AddDbContext<BlogContext>();
              //ASP.NET CORE Identity yapısını kullanabilmek için buraya configurasyon eklemeliyiz. Bunun içinde öncelikle AspNetCore.Identity Nugeti kurulur.
-            serviceCollection.AddIdentity<User, Role>().AddEntityFrameworkStores<BlogContext>();
+            serviceCollection.AddIdentity<User, Role>(options => 
+            {
+                // User Password Options
+                options.Password.RequireDigit = false; // Rakam içersin mi?
+                options.Password.RequiredLength = 5;    // Uzunluğu kaç karakter olsun?
+                options.Password.RequiredUniqueChars = 0; // Şifrede unique character'lerden birbirinden farklı kaç tane olmalı?
+                options.Password.RequireNonAlphanumeric = false; // ?, !, @, $ gibi özel karakterler kullanılsın mı?
+                options.Password.RequireLowercase = false; // Küçük harf içersin mi?
+                options.Password.RequireUppercase = false; // büyük harf içersin mi?
+
+                //User Username and Email Options
+                options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ "; // Kullanıcı adında kullanılmasına izin verdiğin tüm karakterleri gir.
+                options.User.RequireUniqueEmail = true; // Kullanıcı kaydolurken girdiği email adresinden sistemde sadece bir tane olmasına izin verir.
+
+            }).AddEntityFrameworkStores<BlogContext>();
 
             serviceCollection.AddScoped<IUnitOfWork, UnitOfWork>();
             serviceCollection.AddScoped<ICategoryService, CategoryManager>();
