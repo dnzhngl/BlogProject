@@ -7,6 +7,7 @@ using Blog.Services.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
@@ -21,6 +22,13 @@ namespace Blog.Mvc
     {
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
+
+        public IConfiguration Configuration { get; } //ConnectionStringi appsettings.json'dan çekebilmek için
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews().AddRazorRuntimeCompilation().AddJsonOptions(opt =>
@@ -33,7 +41,10 @@ namespace Blog.Mvc
 
             services.AddAutoMapper(typeof(CategoryProfile), typeof(ArticleProfile), typeof(UserProfile));    //Derlenme esnasında AutoMapperın buradaki sınıfları taramasını sağlıyor. IMapper ve Profile sınıflarını bulup buraya ekliyor.
 
-            services.LoadMyService();   // Service injectionını ServiceCollectionExtension'dan çeker.
+            services.LoadMyService(connectionString: Configuration.GetConnectionString("LocalDB"));   // parametre olarak appsettings.json dosyasında connectionstring'e vermiş olduğumuz adı veririz.
+            // Service injection'ını ServiceCollectionExtension'dan çeker.
+
+
             services.AddScoped<IImageHelper, ImageHelper>(); // image helper servisimizi kayediyoruz
             // Cookie işlemleri - ConfigureApplication cookie servisini kullanacağız. Ayarlarını lambda ile giriyoruz.
             services.ConfigureApplicationCookie(options =>

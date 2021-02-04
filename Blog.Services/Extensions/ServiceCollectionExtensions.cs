@@ -4,6 +4,7 @@ using Blog.Data.Concrete.EntityFramework.Contexts;
 using Blog.Entities.Concrete;
 using Blog.Services.Abstract;
 using Blog.Services.Concrete;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -15,9 +16,12 @@ namespace Blog.Services.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection LoadMyService(this IServiceCollection serviceCollection)
+        public static IServiceCollection LoadMyService(this IServiceCollection serviceCollection, string connectionString)
         {
-            serviceCollection.AddDbContext<BlogContext>();
+            // connectionStringi appsettings.Development.json'dan alır.
+            serviceCollection.AddDbContext<BlogContext>(options => options.UseSqlServer(connectionString));
+
+
              //ASP.NET CORE Identity yapısını kullanabilmek için buraya configurasyon eklemeliyiz. Bunun içinde öncelikle AspNetCore.Identity Nugeti kurulur.
             serviceCollection.AddIdentity<User, Role>(options => 
             {
