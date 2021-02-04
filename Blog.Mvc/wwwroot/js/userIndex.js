@@ -323,6 +323,7 @@
                 },
                 error: function (err) {
                     console.log(err);
+                    toastr.error(`${err.responseText}`, 'Hata!');
                 }
             });
         });
@@ -402,8 +403,8 @@
             $.get(url, { userId: id }).done(function (data) {   //ajax get metoduna url'i, ve gönderilecek olan, yani beklenen categoryId parametresini, oluşturduğumuz id değişkenine eşitleyerek gönderir.
                 placeHolderDiv.html(data);      // controllerdan dönen data'yı placeholder div içerisine ekledik. (dönen data partial view ve içerisinde model ile birlikte dönüyor.)
                 placeHolderDiv.find('.modal').modal('show'); // placeHolderDiv'in içerisinde class'ı modal olan div'i modal'a çevirir ve ekranda gösterir.
-            }).fail(function () {   // get işlemi hatayla sonuçlanırsa
-                toastr.error("Bir hata oluştu.", "Hata!");  //toastr ile hatayı göster.
+            }).fail(function (err) {   // get işlemi hatayla sonuçlanırsa
+                toastr.error(`${err.responseText}`, 'Hata!'); //toastr ile hatayı göster.
             });
         });
         // Ajax GET / Getting the _UserUpdatePartial as Modal Form ends here.
@@ -424,45 +425,51 @@
                 processData: false,
                 contentType: false,
                 success: function (data) {
-                    const useryUpdateAjaxModel = jQuery.parseJSON(data);
-                    console.log(useryUpdateAjaxModel);
+                    const userUpdateAjaxModel = jQuery.parseJSON(data);
+                    console.log(userUpdateAjaxModel);
 
-                    const id = useryUpdateAjaxModel.UserDto.User.Id; //parse edilen data içerisindeki kullanıcı id'sini alıyoruz.
-                    const tableRow = $(`[name="${id}"]`); // update işlemini yapacağımız row'a ulaşabilmek için name attribute'nu kullanıyoruz.
+                    let tableRow = "";
+                    let id = "";
+                    if (userUpdateAjaxModel.UserDto !== null) {
+                        id = userUpdateAjaxModel.UserDto.User.Id; //parse edilen data içerisindeki kullanıcı id'sini alıyoruz.
+                        tableRow = $(`[name="${id}"]`); // update işlemini yapacağımız row'a ulaşabilmek için name attribute'nu kullanıyoruz.
+                    }
 
-                    const newFormBody = $('.modal-body', useryUpdateAjaxModel.UserUpdatePartial);
-                    placeHolderDiv.find('modal-body').replaceWith(newFormBody);
+                    const newFormBody = $('.modal-body', userUpdateAjaxModel.UserUpdatePartial);
+                    placeHolderDiv.find('.modal-body').replaceWith(newFormBody);
 
                     const isValid = newFormBody.find('[name="IsValid"]').val() === 'True';
                     if (isValid) {
                         placeHolderDiv.find('.modal').modal('hide');
 
                         dataTable.row(tableRow).data([ // update işlemini yapmak istediğimiz row'u row(tableRow) şeklinde parametre olarak veriyoruz. ve o rowdaki datayı verdiğimiz data ile değiştiriyor.
-                            useryUpdateAjaxModel.UserDto.User.Id,
-                            useryUpdateAjaxModel.UserDto.User.UserName,
-                            useryUpdateAjaxModel.UserDto.User.Email,
-                            useryUpdateAjaxModel.UserDto.User.PhoneNumber,
-                            `   <img src="/img/userImg/${useryUpdateAjaxModel.UserDto.User.Picture}" class="my-image-table" alt="${useryUpdateAjaxModel.UserDto.User.UserName}" />`,
+                            userUpdateAjaxModel.UserDto.User.Id,
+                            userUpdateAjaxModel.UserDto.User.UserName,
+                            userUpdateAjaxModel.UserDto.User.Email,
+                            userUpdateAjaxModel.UserDto.User.PhoneNumber,
+                            `   <img src="/img/userImg/${userUpdateAjaxModel.UserDto.User.Picture}" class="my-image-table" alt="${userUpdateAjaxModel.UserDto.User.UserName}" />`,
                             `
-                                <button class="btn btn-warning btn-sm btn-update" data-id="${useryUpdateAjaxModel.UserDto.User.Id}"><span class="fas fa-edit"></span></button>
-                                <button class="btn btn-danger btn-sm btn-delete" data-id="${useryUpdateAjaxModel.UserDto.User.Id}"><span class="fas fa-minus-circle"></span></button>
+                                <button class="btn btn-warning btn-sm btn-update" data-id="${userUpdateAjaxModel.UserDto.User.Id}"><span class="fas fa-edit"></span></button>
+                                <button class="btn btn-danger btn-sm btn-delete" data-id="${userUpdateAjaxModel.UserDto.User.Id}"><span class="fas fa-minus-circle"></span></button>
                             `
                         ]);
                         tableRow.attr("name", `${id}`); //tableRow'a name attribute'nu ve id değerini ekliyoruz.
-                        dataTabel.row(tableRow).invalidate(); //invalidate sayesinde vermiş olduğumuz rowun değiştiğini belirtiyoruz. Bu durumda dataTable bu rowdaki verileri kontorl edip değişikliği yapıyor.
+                        dataTable.row(tableRow).invalidate(); //invalidate sayesinde vermiş olduğumuz rowun değiştiğini belirtiyoruz. Bu durumda dataTable bu rowdaki verileri kontorl edip değişikliği yapıyor.
 
-                        toastr.success(`${useryUpdateAjaxModel.UserDto.Message}`, 'Başarılı İşlem!');
+                       toastr.success(`${userUpdateAjaxModel.UserDto.Message}`, 'Başarılı İşlem!');
                     } else {
                         let summaryText = "";
+                        
                         $('#validation-summary > ul > li').each(function () {
                             let text = $(this).text();
-                            summaryText = `${text}\n`;
+                            summaryText = `* ${text}\n`;
                         });
                         toastr.warning(summaryText);
                     }
                 },
                 error: function (error) {
                     console.log(error);
+                    toastr.error(`${error.responseText}`, 'Hata!');
                 }
             });
         });

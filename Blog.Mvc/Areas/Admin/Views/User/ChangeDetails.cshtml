@@ -14,7 +14,7 @@
                 @* enctype="multipart/form-data" : form içerisinde hem normal verileri hemde yükleyeceğimiz resme ait verileribirlikte göndermek istiyoruz. Burada bizden farklı dosyalar bekleyeceğini söylemiş oluyoruz.  *@
                 <form asp-controller="User" asp-action="ChangeDetails" enctype="multipart/form-data" id="form-user-update" method="post">
 
-                    <div asp-validation-summary="All" class="text-danger" id="validation-summary"></div>
+                    <div asp-validation-summary="All" class="text-danger" id="validation-summary" style="display:none;"></div>
 
                     <input type="hidden" asp-for="Id" />
 

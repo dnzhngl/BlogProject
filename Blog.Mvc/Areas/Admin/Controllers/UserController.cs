@@ -154,9 +154,6 @@ namespace Blog.Mvc.Areas.Admin.Controllers
 
 
 
-
-
-
         [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<JsonResult> GetAllUsers()
@@ -237,6 +234,7 @@ namespace Blog.Mvc.Areas.Admin.Controllers
                     }
 
                 }
+
                 var updatedUser = _mapper.Map<UserUpdateDto, User>(userUpdateDto, oldUser);
                 var result = await _userManager.UpdateAsync(updatedUser);
                 if (result.Succeeded)   //kullanıcı başarıyla güncellendiyse

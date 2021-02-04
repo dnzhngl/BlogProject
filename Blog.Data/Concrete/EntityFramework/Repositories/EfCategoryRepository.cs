@@ -1,4 +1,5 @@
 ﻿using Blog.Data.Abstract;
+using Blog.Data.Concrete.EntityFramework.Contexts;
 using Blog.Entities.Concrete;
 using Blog.Shared.Data.Concrete.EntityFramework;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +16,19 @@ namespace Blog.Data.Concrete.EntityFramework.Repositories
         public EfCategoryRepository(DbContext context) : base(context)
         {
 
+        }
+
+        private BlogContext BlogContext
+        {
+            get
+            {
+                return _context as BlogContext;
+            }
+        }
+
+        public async Task<Category> GetById(int categoryId)
+        {
+            return await BlogContext.Categories.SingleOrDefaultAsync(c => c.Id == categoryId);
         }
     }
 }

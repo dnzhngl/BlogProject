@@ -384,7 +384,7 @@
                 console.log(categoryUpdateAjaxModel);
 
                 const newFormBody = $('.modal-body', categoryUpdateAjaxModel.CategoryUpdatePartial);
-                placeHolderDiv.find('modal-body').replaceWith(newFormBody);
+                placeHolderDiv.find('.modal-body').replaceWith(newFormBody);
 
                 const isValid = newFormBody.find('[name="IsValid"]').val() === 'True';
                 if (isValid) {
