@@ -22,7 +22,7 @@ namespace Blog.Data.Concrete.EntityFramework.Mappings
             builder.Property(a => a.Thumbnail).IsRequired();
             builder.Property(a => a.Thumbnail).HasMaxLength(250);
             builder.Property(a => a.Date).IsRequired();
-            builder.Property(a => a.ViewsCount).IsRequired();
+            builder.Property(a => a.ViewCount).IsRequired();
             builder.Property(a => a.CommentCount).IsRequired();
             builder.Property(a => a.SeoAuthor).IsRequired();
             builder.Property(a => a.SeoAuthor).HasMaxLength(50);
