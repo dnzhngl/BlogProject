@@ -25,7 +25,7 @@ namespace Blog.Services.Concrete
             _mapper = mapper;
         }
 
-        public async Task<IDataResult<ArticleDto>> Add(ArticleAddDto articleAddDto, string createdByName)
+        public async Task<IDataResult<ArticleDto>> AddAsync(ArticleAddDto articleAddDto, string createdByName)
         {
             var article = _mapper.Map<Article>(articleAddDto);
             article.CreatedByName = createdByName;
@@ -42,7 +42,33 @@ namespace Blog.Services.Concrete
             });
         }
 
-        public async Task<IResult> Delete(int articleId, string modifiedByName)
+        public async Task<IDataResult<int>> CountAsync()
+        {
+            var articlesCount = await _uow.Articles.CountAsync();
+            if (articlesCount > -1)
+            {
+                return new DataResult<int>(ResultStatus.Success, articlesCount);
+            }
+            else
+            {
+                return new DataResult<int>(ResultStatus.Error, $"Beklenmeyen bir hata ile karşılaşıldı.", -1);
+            }
+        }
+
+        public async Task<IDataResult<int>> CountByNonDeletedAsync()
+        {
+            var articlesCount = await _uow.Articles.CountAsync(a => !a.IsDeleted);
+            if (articlesCount > -1)
+            {
+                return new DataResult<int>(ResultStatus.Success, articlesCount);
+            }
+            else
+            {
+                return new DataResult<int>(ResultStatus.Error, $"Beklenmeyen bir hata ile karşılaşıldı.", -1);
+            }
+        }
+
+        public async Task<IResult> DeleteAsync(int articleId, string modifiedByName)
         {
             var result = await _uow.Articles.AnyAsync(a => a.Id == articleId);
             if (result)
@@ -59,7 +85,7 @@ namespace Blog.Services.Concrete
             return new Result(ResultStatus.Error, Messages.Article.NotFound(isPlural: false));
         }
 
-        public async Task<IDataResult<ArticleDto>> Get(int articleId)
+        public async Task<IDataResult<ArticleDto>> GetAsync(int articleId)
         {
             var article = await _uow.Articles.GetAsync(a => a.Id == articleId, a => a.Category, a => a.User);
             if (article != null)
@@ -78,7 +104,7 @@ namespace Blog.Services.Concrete
             });
         }
 
-        public async Task<IDataResult<ArticleListDto>> GetAll()
+        public async Task<IDataResult<ArticleListDto>> GetAllAsync()
         {
             var articles = await _uow.Articles.GetAllAsync(null, a => a.User, a => a.Category);
             if (articles.Count > -1)
@@ -92,7 +118,7 @@ namespace Blog.Services.Concrete
             return new DataResult<ArticleListDto>(ResultStatus.Error, Messages.Article.NotFound(isPlural: true), null);
         }
 
-        public async Task<IDataResult<ArticleListDto>> GetAllByCategory(int categoryId)
+        public async Task<IDataResult<ArticleListDto>> GetAllByCategoryAsync(int categoryId)
         {
             var result = await _uow.Categories.AnyAsync(c => c.Id == categoryId);
             if (result)
@@ -111,7 +137,7 @@ namespace Blog.Services.Concrete
             return new DataResult<ArticleListDto>(ResultStatus.Error, Messages.Category.NotFound(isPlural: false), null);
         }
 
-        public async Task<IDataResult<ArticleListDto>> GetAllByNonDeleted()
+        public async Task<IDataResult<ArticleListDto>> GetAllByNonDeletedAsync()
         {
             var articles = await _uow.Articles.GetAllAsync(a => !a.IsDeleted, a => a.User, a => a.Category);
             if (articles.Count > -1)
@@ -125,7 +151,7 @@ namespace Blog.Services.Concrete
             return new DataResult<ArticleListDto>(ResultStatus.Error, Messages.Article.NotFound(isPlural: true), null);
         }
 
-        public async Task<IDataResult<ArticleListDto>> GetAllByNonDeletedAndActive()
+        public async Task<IDataResult<ArticleListDto>> GetAllByNonDeletedAndActiveAsync()
         {
             var articles = await _uow.Articles.GetAllAsync(a => !a.IsDeleted && a.IsActive, a => a.User, a => a.Category);
             if (articles.Count > -1)
@@ -139,7 +165,7 @@ namespace Blog.Services.Concrete
             return new DataResult<ArticleListDto>(ResultStatus.Error, Messages.Article.NotFound(isPlural: true), null);
         }
 
-        public async Task<IResult> HardDelete(int articleId)
+        public async Task<IResult> HardDeleteAsync(int articleId)
         {
             var result = await _uow.Articles.AnyAsync(a => a.Id == articleId);
             if (result)
@@ -153,7 +179,7 @@ namespace Blog.Services.Concrete
             return new Result(ResultStatus.Error, Messages.Article.NotFound(isPlural: false));
         }
 
-        public async Task<IDataResult<ArticleDto>> Update(ArticleUpdateDto articleUpdateDto, string modifiedByName)
+        public async Task<IDataResult<ArticleDto>> UpdateAsync(ArticleUpdateDto articleUpdateDto, string modifiedByName)
         {
             var article = _mapper.Map<Article>(articleUpdateDto);
             article.ModifiedByName = modifiedByName;
@@ -167,5 +193,6 @@ namespace Blog.Services.Concrete
                 Message = Messages.Article.Update(updatedArticle.Title)
             });
         }
+        
     }
 }

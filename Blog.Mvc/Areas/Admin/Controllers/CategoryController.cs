@@ -28,7 +28,7 @@ namespace Blog.Mvc.Areas.Admin.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var result = await _categoryService.GetAllByNonDeleted();
+            var result = await _categoryService.GetAllByNonDeletedAsync();
             return View(result.Data);
         }
 
@@ -50,7 +50,7 @@ namespace Blog.Mvc.Areas.Admin.Controllers
             #endregion
             if (ModelState.IsValid)
             {
-                var result = await _categoryService.Add(categoryAddDto, "dnzhngl");
+                var result = await _categoryService.AddAsync(categoryAddDto, "dnzhngl");
                 if (result.ResultStatus == ResultStatus.Success)
                 {
                     var categoryAddAjaxModel = JsonSerializer.Serialize(new CategoryAddAjaxViewModel
@@ -70,7 +70,7 @@ namespace Blog.Mvc.Areas.Admin.Controllers
 
         public async Task<JsonResult> GetAllCategories()
         {
-            var result = await _categoryService.GetAllByNonDeleted();
+            var result = await _categoryService.GetAllByNonDeletedAsync();
             var categories = JsonSerializer.Serialize(result.Data, new JsonSerializerOptions
             {
                 ReferenceHandler = ReferenceHandler.Preserve
@@ -81,7 +81,7 @@ namespace Blog.Mvc.Areas.Admin.Controllers
         [HttpPost]
         public async Task<JsonResult> Delete(int categoryId) //CategoryId Jquery ile post ettiğimizde butona vermiş olduğumuz data-id attributeu sayesinde buraya gönderilecek.
         {
-            var result = await _categoryService.Delete(categoryId, "dnzhngl");
+            var result = await _categoryService.DeleteAsync(categoryId, "dnzhngl");
             var deletedCategory = JsonSerializer.Serialize(result.Data);
             return Json(deletedCategory);
         }
@@ -89,7 +89,7 @@ namespace Blog.Mvc.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> Update(int categoryId)
         {
-            var result = await _categoryService.GetCategoryUpdateDto(categoryId);
+            var result = await _categoryService.GetCategoryUpdateDtoAsync(categoryId);
             if (result.ResultStatus == ResultStatus.Success)
             {
                 return PartialView("_CategoryUpdatePartial", result.Data);
@@ -101,7 +101,7 @@ namespace Blog.Mvc.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                var result = await _categoryService.Update(categoryUpdateDto, "dnzhngl");
+                var result = await _categoryService.UpdateAsync(categoryUpdateDto, "dnzhngl");
                 if (result.ResultStatus == ResultStatus.Success)
                 {
                     var categoryUpdateAjaxModel = JsonSerializer.Serialize(new CategoryUpdateAjaxViewModel

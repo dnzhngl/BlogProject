@@ -4,6 +4,12 @@
     Layout = "_Layout";
     ViewBag.Title = "Kullanıcılar";
 }
+
+<ol class="breadcrumb mb-3 mt-2">
+    <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Home" asp-action="Index">Admin</a></li>
+    <li class="breadcrumb-item active"><a asp-area="Admin" asp-controller="User" asp-action="Index">Kullanıcılar</a></li>
+</ol>
+
 @if (Model.ResultStatus == ResultStatus.Success)
 {
     <div id="modalPlaceHolder" aria-hidden="true"></div>
@@ -48,7 +54,7 @@
                                 <td>@user.Email</td>
                                 <td>@user.PhoneNumber</td>
                                 <td>
-                                    <img src="~/img/userImg/@user.Picture" class="my-image-table" alt="@user.UserName"/>
+                                    <img src="~/img/userImg/@user.Picture" class="my-image-table" alt="@user.UserName" />
                                 </td>
                                 <td>
                                     <button class="btn btn-warning btn-sm btn-update" data-id="@user.Id"><span class="fas fa-edit"></span></button>
@@ -71,5 +77,5 @@
 }
 @section Scripts
 {
-    <script src="~/js/userIndex.js" type="application/ecmascript"></script>
+    <script src="~/AdminLTE/js/userIndex.js" type="application/ecmascript"></script>
 }

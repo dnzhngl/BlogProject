@@ -11,16 +11,23 @@ namespace Blog.Services.Abstract
 {
     public interface ICategoryService
     {
-        Task<IDataResult<CategoryDto>> Get(int categoryId);
-        Task<IDataResult<CategoryListDto>> GetAll();
-        Task<IDataResult<CategoryListDto>> GetAllByNonDeleted();
-        Task<IDataResult<CategoryListDto>> GetAllByNonDeletedAndActive();
+        Task<IDataResult<CategoryDto>> GetAsync(int categoryId);
+        Task<IDataResult<CategoryListDto>> GetAllAsync();
+        Task<IDataResult<CategoryListDto>> GetAllByNonDeletedAsync();
+        Task<IDataResult<CategoryListDto>> GetAllByNonDeletedAndActiveAsync();
 
-        Task<IDataResult<CategoryDto>> Add(CategoryAddDto categoryAddDto, string createdByName);
-        Task<IDataResult<CategoryDto>> Update(CategoryUpdateDto categoryUpdateDto, string modifiedByName);
-        Task<IDataResult<CategoryDto>> Delete(int categoryId, string modifiedByName);   //isDeleted değiştirilir
-        Task<IResult> HardDelete(int categoryId);   //veritabanından silmek için
+        Task<IDataResult<CategoryDto>> AddAsync(CategoryAddDto categoryAddDto, string createdByName);
+        Task<IDataResult<CategoryDto>> UpdateAsync(CategoryUpdateDto categoryUpdateDto, string modifiedByName);
+        Task<IDataResult<CategoryDto>> DeleteAsync(int categoryId, string modifiedByName);   //isDeleted değiştirilir
+        Task<IResult> HardDeleteAsync(int categoryId);   //veritabanından silmek için
 
-        Task<IDataResult<CategoryUpdateDto>> GetCategoryUpdateDto(int categoryId); //CategoryUpdate için CategoryUpdateDto türünde return yapacak
+        Task<IDataResult<CategoryUpdateDto>> GetCategoryUpdateDtoAsync(int categoryId); //CategoryUpdate için CategoryUpdateDto türünde return yapacak
+        Task<IDataResult<int>> CountAsync();
+        Task<IDataResult<int>> CountByNonDeletedAsync();
+
+        Task<IDataResult<CategoryListDto>> GetAllWithArticlesAsync();
+        Task<IDataResult<CategoryListDto>> GetAllByNonDeletedWithArticlesAsync();
+        Task<IDataResult<CategoryListDto>> GetAllByNonDeletedAndActiveWithArticlesAsync();
+
     }
 }
