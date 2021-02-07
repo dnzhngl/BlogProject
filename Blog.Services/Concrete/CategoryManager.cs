@@ -25,6 +25,12 @@ namespace Blog.Services.Concrete
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Adds a new Category into the database with the given data in parameters.
+        /// </summary>
+        /// <param name="categoryAddDto"> The information of the Category to be added must be entered in CategoryAddDto type. </param>
+        /// <param name="createdByName"> The username of the creator must be entered in a type of string. </param>
+        /// <returns> Returns type of DataResult as a result of an asynchronous adding operation. </returns>
         public async Task<IDataResult<CategoryDto>> AddAsync(CategoryAddDto categoryAddDto, string createdByName)
         {
             #region Without AutoMApper
@@ -246,6 +252,11 @@ namespace Blog.Services.Concrete
             });
         }
 
+        /// <summary>
+        /// Gets the category, if any, with the specified id. If it can not find any data, CategoryUpdateDto returns with the ResulStatus.Error and NotFound message.
+        /// </summary>
+        /// <param name="categoryId">CategoryId must be bigger than 0 and type of integer.</param>
+        /// <returns>Returns type of DataResult as a result of an asynchronous operation.</returns>
         public async Task<IDataResult<CategoryUpdateDto>> GetCategoryUpdateDtoAsync(int categoryId)
         {
             var result = await _uow.Categories.AnyAsync(c => c.Id == categoryId);
