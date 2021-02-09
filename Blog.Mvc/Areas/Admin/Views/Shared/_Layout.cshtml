@@ -7,7 +7,9 @@
     <meta name="description" content="" />
     <meta name="author" content="" />
     <title>@ViewBag.Title - Admin Paneli - Blog</title>
-   @await Html.PartialAsync("_LayoutCssPartial")
+    @await Html.PartialAsync("_LayoutCssPartial")
+    @await RenderSectionAsync("Styles", false)
+    <link href="~/AdminLTE/css/site.css" rel="stylesheet" /> @* Bizim oluşturmuş olduğumuz css dosyası. Diğer Css dosyalarından sonra yüklenmesi için buraya yerleştirdik.*@
 </head>
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">

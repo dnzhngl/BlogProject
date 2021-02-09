@@ -17,6 +17,9 @@
                 className: 'btn btn-success',
                 action: function (e, dt, node, config) {
                     //alert('Ekle butonuna basıldı');
+                    let url = window.location.href; // URl'i window location üzerinden alma sebebimiz, şuanda localhost üzerinde çalışıyoruz ama ileride başka bir adreste çalışabiliriz. O yüzden dinamik bir şekilde alıyoruz.
+                    url = url.replace("/Index", ""); // Kullanıcı Article/Index ile article sayfasına giderse aşağıdaki kodumuz çalışmayacaktır. O yüzden url içerisinde Index var ise onu "" ile replace ediyoruz.
+                    window.open(`${url}/Add`,"_self");  //Url'adresimize Add eklediğimizde controllerdaki Add metoduna yönlendiriliyoruz. "_self" ise aynı sayfa içerisinde aç anlamına geliyor.
                 }
             },
             {
