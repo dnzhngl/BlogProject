@@ -25,12 +25,12 @@ namespace Blog.Services.Concrete
             _mapper = mapper;
         }
 
-        public async Task<IDataResult<ArticleDto>> AddAsync(ArticleAddDto articleAddDto, string createdByName)
+        public async Task<IDataResult<ArticleDto>> AddAsync(ArticleAddDto articleAddDto, string createdByName, int userId)
         {
             var article = _mapper.Map<Article>(articleAddDto);
             article.CreatedByName = createdByName;
             article.ModifiedByName = createdByName;
-            article.UserId = 1;
+            article.UserId = userId;
             var addedArticle = await _uow.Articles.AddAsync(article);
             await _uow.SaveAsync();
 
@@ -75,6 +75,7 @@ namespace Blog.Services.Concrete
             {
                 var article = await _uow.Articles.GetAsync(a => a.Id == articleId);
                 article.IsDeleted = true;
+                article.IsActive = false;
                 article.ModifiedByName = modifiedByName;
                 article.ModifiedDate = DateTime.Now;
                 await _uow.Articles.UpdateAsync(article);
@@ -181,7 +182,8 @@ namespace Blog.Services.Concrete
 
         public async Task<IDataResult<ArticleDto>> UpdateAsync(ArticleUpdateDto articleUpdateDto, string modifiedByName)
         {
-            var article = _mapper.Map<Article>(articleUpdateDto);
+            var oldArticle = await _uow.Articles.GetAsync(a => a.Id == articleUpdateDto.Id);
+            var article = _mapper.Map<ArticleUpdateDto, Article>(articleUpdateDto, oldArticle);
             article.ModifiedByName = modifiedByName;
             var updatedArticle = await _uow.Articles.UpdateAsync(article);
             await _uow.SaveAsync();
@@ -193,6 +195,17 @@ namespace Blog.Services.Concrete
                 Message = Messages.Article.Update(updatedArticle.Title)
             });
         }
-        
+
+        public async Task<IDataResult<ArticleUpdateDto>> GetArticleUpdateDtoAsync(int articleId)
+        {
+            var result = await _uow.Articles.AnyAsync(c => c.Id == articleId);
+            if (result)
+            {
+                var article = await _uow.Articles.GetAsync(c => c.Id == articleId);
+                var articleUpdateDto = _mapper.Map<ArticleUpdateDto>(article);
+                return new DataResult<ArticleUpdateDto>(ResultStatus.Success, articleUpdateDto);
+            }
+            return new DataResult<ArticleUpdateDto>(ResultStatus.Error, Messages.Article.NotFound(isPlural: false), null);
+        }
     }
 }

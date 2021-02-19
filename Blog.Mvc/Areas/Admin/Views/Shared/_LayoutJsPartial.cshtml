@@ -13,3 +13,4 @@
 <script src="https://cdn.datatables.net/buttons/1.6.5/js/buttons.bootstrap4.min.js" crossorigin="anonymous"></script> @* Datatable button *@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" crossorigin="anonymous"></script> @* Toastr *@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@@10"></script> @* SweetAlert *@
+@await Component.InvokeAsync("NToastNotify")  @*NToastNotify - Dökümantasyonunda Layout sayfasında body etiketinin bittiği yerin hemen üstüne eklenmesini öneriyor. Böylece önce JQuery, sonra Toastr en sonda NToasNotify'ın yüklenmesini sağlıyoruz.*@

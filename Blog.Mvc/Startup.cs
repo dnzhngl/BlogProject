@@ -35,11 +35,12 @@ namespace Blog.Mvc
             {
                 opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 opt.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve; // Nested objelerin gelmesi için ekleniyor. 
-            }); //Bu projenin bir mvc projesi olduğunu belirtir. Sonuna Eklemiş olduğumuz JsonOptions sayesinde modellerimizi Json formatında dönebileceğiz. .NET 5 ile gelen bir özellik bu sayede 3. parti extensionlara ihtiyacımız olmadan Json dönüşümünü sağlayabiliyoruz.
+            }).AddNToastNotifyToastr(); //Bu projenin bir mvc projesi olduğunu belirtir. Sonuna Eklemiş olduğumuz JsonOptions sayesinde modellerimizi Json formatında dönebileceğiz. .NET 5 ile gelen bir özellik bu sayede 3. parti extensionlara ihtiyacımız olmadan Json dönüşümünü sağlayabiliyoruz. // Sona eklediğimiz AddNToastNotifyToastr Notify paketinin kullanımı için eklenen servis.
+
 
             services.AddSession(); //Session kullanıcı sitemize giriş yaptığı anda server'da oluşturulan bir oturumdur. Burada servisler arasına session yapısını eklemek istediğimizi söylüyoruz.
 
-            services.AddAutoMapper(typeof(CategoryProfile), typeof(ArticleProfile), typeof(UserProfile));    //Derlenme esnasında AutoMapperın buradaki sınıfları taramasını sağlıyor. IMapper ve Profile sınıflarını bulup buraya ekliyor.
+            services.AddAutoMapper(typeof(CategoryProfile), typeof(ArticleProfile), typeof(UserProfile), typeof(ViewModelsProfile));    //Derlenme esnasında AutoMapperın buradaki sınıfları taramasını sağlıyor. IMapper ve Profile sınıflarını bulup buraya ekliyor.
 
             services.LoadMyService(connectionString: Configuration.GetConnectionString("LocalDB"));   // parametre olarak appsettings.json dosyasında connectionstring'e vermiş olduğumuz adı veririz.
             // Service injection'ını ServiceCollectionExtension'dan çeker.
@@ -86,6 +87,8 @@ namespace Blog.Mvc
             // Örn. projemizde Admin area'ya sadece kimlik doğrulamasından geçen ve yetkisi olan kullanıcılar erişebilecek. 
             app.UseAuthentication();    // Kimlik doğrulaması
             app.UseAuthorization();     // Yetki kontrolü
+
+            app.UseNToastNotify(); //NToastNotify eklentisi
 
             app.UseEndpoints(endpoints =>
             {

@@ -31,52 +31,74 @@
 
                     $.ajax({
                         type: 'GET',    // Ne tipte bir Ajax işlemi kullandığımızı belirtiyoruz.
-                        url: '/Admin/User/GetAllUsers/', //Get işlemi yapacağımız URL adresini veriyoruz.
+                        url: '/Admin/Article/GetAllArticles/', //Get işlemi yapacağımız URL adresini veriyoruz.
                         contentType: "application/json",    // Ajax işlemini yaptığımızda hangi tipte işlem yapacağımızı belirtiyoruz. Burada json tipini verdik.
                         beforeSend: function () {       //Ajax işlemini yapmadan önce çalışacak olan actionınımız.
-                            $('#usersTable').hide();   // tablomuzun gizlenmesi
+                            $('#articlesTable').hide();   // tablomuzun gizlenmesi
                             $('.spinner-border').show();    // sayfanın yenilendiğini göstermek için spinnerin görünmesi
                         },
                         success: function (data) { //Ajax get işlemi başarılı olarak gerçekleşirse
                             //console.log(data);
-                            const userListDto = jQuery.parseJSON(data); // controllerdan userListDto Json formatında dönüyor
-                            console.log(userListDto);
+                            const articleResult = jQuery.parseJSON(data); // controllerdan articleResult Json formatında dönüyor
+                            console.log(articleResult);
 
                             dataTable.clear(); // Önce dataTable içerisindeki herşeyi temizliyoruz.
 
-                            if (userListDto.ResultStatus === 0) {   // controllerdan dönen userListDto datamızın içerisinde yer alan ResultStatus değerimizi kontrol ediyoruz.
+                            if (articleResult.Data.ResultStatus === 0) {   // controllerdan dönen userListDto datamızın içerisinde yer alan ResultStatus değerimizi kontrol ediyoruz.
 
-                                $.each(userListDto.Users.$values, function (index, user) { // Jquery each metodunda parametre olarak önce hangi değerleriçerisinde dönecekse onu veriyoruz, sonrasinda ise her bir değer üzerinde gerçekleştireceği işlemleri fonksiyon olarak yazıyoruz.
+                                $.each(articleResult.Data.Articles.$values, function (index, article) { // Jquery each metodunda parametre olarak önce hangi değerleriçerisinde dönecekse onu veriyoruz, sonrasinda ise her bir değer üzerinde gerçekleştireceği işlemleri fonksiyon olarak yazıyoruz.
                                     // userListDto datamızın içerisindeki Categories'in içerisindeki değerlerin valuelarını alıyoruz.
+                                    const newArticle = getJsonNetObject(article, articleResult.Data.Articles.$values);
+                                    console.log(newArticle);
+
+
+                                    //let newCategory = getJsonNetObject(newArticle.Category, newArticle.$id);
+                                    //if (newCategory !== null) {
+                                    //    categoriesArray.push(newCategory);
+                                    //}
+                                    //if (newCategory === null) {
+                                    //    newCategory = categoriesArray.find((cat) => {
+                                    //        return cat.$id === newArticle.Category.$ref;
+                                    //    });
+                                    //}
 
                                     const newTableRow = dataTable.row.add([
-                                        user.Id,
-                                        user.UserName,
-                                        user.Email,
-                                        user.PhoneNumber,
-                                        `<img src="/img/userImg/${user.Picture}" class="my-image-table" alt="${user.UserName}" />`,
+                                        newArticle.Id,
+                                        newArticle.Category.Name,
+                                       // newCategory.Name,
+                                        newArticle.Title,
+                                        `<img src="/img/postImages/${newArticle.Thumbnail}" class="my-image-table" alt="${newArticle.Title}" />`,
+                                        `${convertToShortDate(newArticle.Date)}`,
+                                        newArticle.ViewCount,
+                                        newArticle.CommentCount,
+                                        `${newArticle.IsActive ? "Evet" : "Hayır" }`,
+                                        `${newArticle.IsDeleted ? "Evet" : "Hayır"}`,
+                                        `${convertToShortDate(newArticle.CreatedDate)}`,
+                                        newArticle.CreatedByName,
+                                        `${convertToShortDate(newArticle.ModifiedDate)}`,
+                                        newArticle.ModifiedByName,
                                         `
-                                         <button class="btn btn-warning btn-sm btn-update" data-id="${user.Id}"><span class="fas fa-edit"></span></button>
-                                         <button class="btn btn-danger btn-sm btn-delete" data-id="${user.Id}"><span class="fas fa-minus-circle"></span></button>
+                                         <button class="btn btn-warning btn-sm btn-update" data-id="${newArticle.Id}"><span class="fas fa-edit"></span></button>
+                                         <button class="btn btn-danger btn-sm btn-delete" data-id="${newArticle.Id}"><span class="fas fa-minus-circle"></span></button>
                                          `
                                     ]).node(); // newTableRow = o an eklenmiş olan row'umuz oluyor.
 
                                     const jqueryTableRow = $(newTableRow);
-                                    jqueryTableRow.attr('name', `${user.Id}`); //tableRow'a name attribute'u ve id değerini ekledik.
+                                    jqueryTableRow.attr('name', `${newArticle.Id}`); //tableRow'a name attribute'u ve id değerini ekledik.
 
                                 });
                                 dataTable.draw();
 
                                 $('.spinner-border').hide(); //spinner'ı gizliyoruz.
-                                $('#usersTable').fadeIn(1400); //tablomuzun fade efekti ile tekrar görünmesini sağlıyoruz.
+                                $('#articlesTable').fadeIn(1400); //tablomuzun fade efekti ile tekrar görünmesini sağlıyoruz.
                             } else {    //ResultStatus 1 yani false dönerse
-                                toastr.error(`${userListDto.Message}`, 'işlem Başarısız!'); //toastr.error ile controllerdan döndürüğümüz hata mesajını bastırır
+                                toastr.error(`${articleResult.Data.Message}`, 'işlem Başarısız!'); //toastr.error ile controllerdan döndürüğümüz hata mesajını bastırır
                             }
                         },
                         error: function (err) { //AJax get işlemimizde hata oluşursa
                             console.log(err);   //hatayı console yazdır.
                             $('.spinner-border').hide(); //Hata aldığımızda spinnerin sonsuza kadar dönmemesi için spinner'ı gizliyoruz.
-                            $('#usersTable').fadeIn(1000); //Ve tekrardan tablomuzun fade efekti ile görünmesini sağlıyoruz.
+                            $('#articlesTable').fadeIn(1000); //Ve tekrardan tablomuzun fade efekti ile görünmesini sağlıyoruz.
                             toastr.error(`${err.responseText}`, 'Hata!'); //toastr.error ile controllerdan döndürüğümüz hata mesajını bastırır
                         }
                     });
@@ -238,15 +260,15 @@
 
 
     // Delete
-    // Ajax POST / Deleting a User starts from here. 
+    // Ajax POST / Deleting an Article starts from here. 
     $(document).on('click', '.btn-delete', function (event) {
         event.preventDefault(); //eğer buton submit butonu olsaydı sayfa tekrar yüklenirdi o yüzden önlem amaçlı event.preventDefault yazıyoruz.
         const id = $(this).attr('data-id');
         const tableRow = $(`[name="${id}"]`); // Silme işleminin yapılacağı row seçiliyor.Silme mesajından sonra silinen veriye ait row'un tablodan kaybolması için ve bu rowun özelliklerinden yararlanmak için rowu bir değişkene atıyoruz.
-        const userName = tableRow.find('td:eq(1)').text(); // TableRowa ait olan 2. kolondaki table datayı seçiyoruz.
+        const articleTitle = tableRow.find('td:eq(2)').text(); // TableRowa ait olan 2. kolondaki table datayı seçiyoruz.
         // SweetAlert kodlarımız kaynak: https://sweetalert2.github.io/
         Swal.fire({
-            title: `${userName} adlı kullanıcıyı silmek istediğinize emin misiniz?`,
+            title: `${articleTitle} başlıklı makaleyi silmek istediğinize emin misiniz?`,
             text: "Bu işlemi geri alamazsınız!",
             icon: 'warning',
             showCancelButton: true,
@@ -259,17 +281,18 @@
                 $.ajax({
                     type: 'POST',   //yapacağımız işlemin türü (type)
                     dataType: 'json',   // yapacağımız işlemi hangi veri tipinde yapıyoruz ( json tipinde bir veri göndericez)
-                    data: { userId: id }, // veri controllera nereden gelecek? action kısmınde ne bekliyorsak onu bir javascript objesi olarak göndereceğiz. Controller içerisindeki Delete actionumuza parametre olarak controllerId göndermemiz gerekiyor.
-                    url: '/Admin/User/Delete/',   // veriyi göndereceğimiz url(action adresi)
+                    data: { articleId: id }, // Buradaki articleId bizim ilgili actionımızın bizden beklediği isim, id değeri de delete işlemlerin başında name attribute'undan aldığımız değer. Veri controllera nereden gelecek? action kısmınde ne bekliyorsak onu bir javascript objesi olarak göndereceğiz. Controller içerisindeki Delete actionumuza parametre olarak controllerId göndermemiz gerekiyor.
+                    url: '/Admin/Article/Delete/',   // veriyi göndereceğimiz url(action adresi)
                     // actionlar
                     // success actionu
                     success: function (data) { // controllerdaki actionumuzdan Json formatında bir IResult tipinde bir data döner, bunu fonksiyonumuza parametre olarak veriyoruz.
-                        const userDto = jQuery.parseJSON(data); // gelen datayı Json'a parse edip modele dönüştürüyor.
-                        console.log(userDto);
-                        if (userDto.ResultStatus === 0) {    // dönen verimizde ReultStatus'umuz 0 yani başarılı ise Swal.fire ile silindi mesajı gösterilir.
+                        const articleResult = jQuery.parseJSON(data); // gelen datayı Json'a parse edip modele dönüştürüyor.
+                        console.log(articleResult);
+
+                        if (articleResult.ResultStatus === 0) {    // dönen verimizde ResultStatus'umuz 0 yani başarılı ise Swal.fire ile silindi mesajı gösterilir.
                             Swal.fire(
                                 'Silindi!',
-                                `${userDto.User.UserName} adlı kullanıcı başarıyla silinmiştir.`,
+                                `${articleResult.Message}`,
                                 'success'
                             );
                             //tableRow.fadeOut(3500); // Ardından rowumuzun tablodan fadeOut efektiyle yok olmasını sağlarız. -- DataTable Api uygulamadan önce
@@ -280,7 +303,7 @@
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Bir hata oluştu...',
-                                text: `${userDto.Message}`,
+                                text: `${articleResult.Message}`,
                             });
                         }
                     },
@@ -293,5 +316,5 @@
             }
         });
     });
-    // Ajax POST / Deleting a User ends here. 
+    // Ajax POST / Deleting an Article ends here. 
 });

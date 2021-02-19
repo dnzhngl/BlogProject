@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Blog.Entities.ComplexTypes;
 using Blog.Entities.Concrete;
 using Blog.Entities.Dtos;
 using Blog.Mvc.Areas.Admin.Models;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NToastNotify;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -27,13 +29,15 @@ namespace Blog.Mvc.Areas.Admin.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly IMapper _mapper;
         private readonly IImageHelper _imageHelper;
+        private readonly IToastNotification _toastNotification; //NToastNotify 
 
-        public UserController(UserManager<User> userManager, IMapper mapper, SignInManager<User> signInManager, IImageHelper imageHelper)
+        public UserController(UserManager<User> userManager, IMapper mapper, SignInManager<User> signInManager, IImageHelper imageHelper, IToastNotification toastNotification)
         {
             _userManager = userManager;
             _mapper = mapper;
             _signInManager = signInManager;
             _imageHelper = imageHelper;
+            _toastNotification = toastNotification;
         }
 
         [Authorize(Roles = "Admin")]
@@ -108,7 +112,8 @@ namespace Blog.Mvc.Areas.Admin.Controllers
             if (ModelState.IsValid)
             {
                 //userAddDto.Picture = await ImageUpload(userAddDto.UserName, userAddDto.PictureFile); -- before ImageHelper
-                var uploadedImageDtoResult = await _imageHelper.UploadUserImage(userAddDto.UserName, userAddDto.PictureFile);
+                //var uploadedImageDtoResult = await _imageHelper.UploadUserImage(userAddDto.UserName, userAddDto.PictureFile); // Before Upload method in image helper revized.
+                var uploadedImageDtoResult = await _imageHelper.Upload(userAddDto.UserName, userAddDto.PictureFile, PictureType.User);
                 userAddDto.Picture = uploadedImageDtoResult.ResultStatus == ResultStatus.Success
                     ? uploadedImageDtoResult.Data.PictureName : "defaultUser.png";
 
@@ -222,7 +227,8 @@ namespace Blog.Mvc.Areas.Admin.Controllers
                 var folderName = "";
                 if (userUpdateDto.PictureFile != null) // Yeni resim eklendi mi?
                 {
-                    var uploadedImageDtoResult = await _imageHelper.UploadUserImage(userUpdateDto.UserName, userUpdateDto.PictureFile);
+                    //var uploadedImageDtoResult = await _imageHelper.UploadUserImage(userUpdateDto.UserName, userUpdateDto.PictureFile); //Before Upload method in ImagerHelper class created
+                    var uploadedImageDtoResult = await _imageHelper.Upload(userUpdateDto.UserName, userUpdateDto.PictureFile, PictureType.User);
                     userUpdateDto.Picture = uploadedImageDtoResult.ResultStatus == ResultStatus.Success
                         ? uploadedImageDtoResult.Data.PictureName : "defaultUser.png";  // "defaultUser.png"
 
@@ -241,7 +247,7 @@ namespace Blog.Mvc.Areas.Admin.Controllers
                 {
                     if (isNewPictureUploaded)  // Yeni resim eklendiyse eski resmi sistemden sil.
                     {
-                        _imageHelper.Delete(oldUserPicture, folderName);
+                        _imageHelper.Delete(oldUserPicture, PictureType.User, folderName);
                     }
                     var userUpdateViewModel = JsonSerializer.Serialize(new UserUpdateAjaxViewModel
                     {
@@ -302,7 +308,8 @@ namespace Blog.Mvc.Areas.Admin.Controllers
                 var folderName = "";
                 if (userUpdateDto.PictureFile != null) // Yeni resim eklendi mi?
                 {
-                    var uploadedImageDtoResult = await _imageHelper.UploadUserImage(userUpdateDto.UserName, userUpdateDto.PictureFile);
+                    //var uploadedImageDtoResult = await _imageHelper.UploadUserImage(userUpdateDto.UserName, userUpdateDto.PictureFile);
+                    var uploadedImageDtoResult = await _imageHelper.Upload(userUpdateDto.UserName, userUpdateDto.PictureFile, PictureType.User);
                     userUpdateDto.Picture = uploadedImageDtoResult.ResultStatus == ResultStatus.Success
                         ? uploadedImageDtoResult.Data.PictureName : "defaultUser.png";  // "defaultUser.png"
                     folderName = uploadedImageDtoResult.Data.FolderName;
@@ -317,10 +324,11 @@ namespace Blog.Mvc.Areas.Admin.Controllers
                 {
                     if (isNewPictureUploaded)  // Yeni resim eklendiyse eski resmi sistemden sil. Ancak eski resim default resimse silme.
                     {
-                        _imageHelper.Delete(oldUserPicture, folderName);
+                        _imageHelper.Delete(oldUserPicture, PictureType.User, folderName);
                     }
 
-                    TempData.Add("SuccessMessage", $"{updatedUser.UserName}, kullanıcı bilgileriniz başarıyla güncellenmiştir.");
+                    //TempData.Add("SuccessMessage", $"{updatedUser.UserName}, kullanıcı bilgileriniz başarıyla güncellenmiştir.");
+                    _toastNotification.AddSuccessToastMessage($"{updatedUser.UserName}, kullanıcı bilgileriniz başarıyla güncellenmiştir.");
                     return View(userUpdateDto);
                 }
                 else
@@ -360,7 +368,9 @@ namespace Blog.Mvc.Areas.Admin.Controllers
                         await _userManager.UpdateSecurityStampAsync(user);
                         await _signInManager.SignOutAsync();
                         await _signInManager.PasswordSignInAsync(user, userPasswordChangeDto.NewPassword, true, false);
-                        TempData.Add("SuccessMessage", "Şifreniz başarıyla değiştirilmiştir.");
+                        //TempData.Add("SuccessMessage", "Şifreniz başarıyla değiştirilmiştir.");
+                        _toastNotification.AddSuccessToastMessage("Şifreniz başarıyla değiştirilmiştir.");
+
                         return View();
                     }
                     else
