@@ -46,26 +46,30 @@
 
                             if (articleResult.Data.ResultStatus === 0) {   // controllerdan dönen userListDto datamızın içerisinde yer alan ResultStatus değerimizi kontrol ediyoruz.
 
+                                let categoriesArray = []; // Kategori dizisi
+
                                 $.each(articleResult.Data.Articles.$values, function (index, article) { // Jquery each metodunda parametre olarak önce hangi değerleriçerisinde dönecekse onu veriyoruz, sonrasinda ise her bir değer üzerinde gerçekleştireceği işlemleri fonksiyon olarak yazıyoruz.
                                     // userListDto datamızın içerisindeki Categories'in içerisindeki değerlerin valuelarını alıyoruz.
                                     const newArticle = getJsonNetObject(article, articleResult.Data.Articles.$values);
                                     console.log(newArticle);
 
+                                    let newCategory = getJsonNetObject(newArticle.Category, newArticle);    // newArticle üzerinden newCategory'i aldık.
+                                    console.log(newCategory);
 
-                                    //let newCategory = getJsonNetObject(newArticle.Category, newArticle.$id);
-                                    //if (newCategory !== null) {
-                                    //    categoriesArray.push(newCategory);
-                                    //}
-                                    //if (newCategory === null) {
-                                    //    newCategory = categoriesArray.find((cat) => {
-                                    //        return cat.$id === newArticle.Category.$ref;
-                                    //    });
-                                    //}
+                                    if (newCategory !== null) {
+                                        categoriesArray.push(newCategory);  // newCategory boş değilse array'e ekledik.
+                                    }
+                                    if (newCategory === null) { //newCategory boş ise, categoriesArray içerisinden listeye eklenmekte olan newArticle'ın Category alanındaki ref değeri categoriesArray içerisindeki categorinin id'sine eşit olanı çektik.
+                                        newCategory = categoriesArray.find((cat) => {
+                                            return cat.$id === newArticle.Category.$ref;
+                                        });
+                                    }
+                                    console.log(newCategory);
 
                                     const newTableRow = dataTable.row.add([
                                         newArticle.Id,
-                                        newArticle.Category.Name,
-                                       // newCategory.Name,
+                                        // newArticle.Category.Name,
+                                        newCategory.Name,
                                         newArticle.Title,
                                         `<img src="/img/postImages/${newArticle.Thumbnail}" class="my-image-table" alt="${newArticle.Title}" />`,
                                         `${convertToShortDate(newArticle.Date)}`,
