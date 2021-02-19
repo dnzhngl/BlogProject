@@ -40,7 +40,7 @@ namespace Blog.Mvc
 
             services.AddSession(); //Session kullanıcı sitemize giriş yaptığı anda server'da oluşturulan bir oturumdur. Burada servisler arasına session yapısını eklemek istediğimizi söylüyoruz.
 
-            services.AddAutoMapper(typeof(CategoryProfile), typeof(ArticleProfile), typeof(UserProfile), typeof(ViewModelsProfile));    //Derlenme esnasında AutoMapperın buradaki sınıfları taramasını sağlıyor. IMapper ve Profile sınıflarını bulup buraya ekliyor.
+            services.AddAutoMapper(typeof(CategoryProfile), typeof(ArticleProfile), typeof(UserProfile), typeof(ViewModelsProfile), typeof(CommentProfile));    //Derlenme esnasında AutoMapperın buradaki sınıfları taramasını sağlıyor. IMapper ve Profile sınıflarını bulup buraya ekliyor.
 
             services.LoadMyService(connectionString: Configuration.GetConnectionString("LocalDB"));   // parametre olarak appsettings.json dosyasında connectionstring'e vermiş olduğumuz adı veririz.
             // Service injection'ını ServiceCollectionExtension'dan çeker.
