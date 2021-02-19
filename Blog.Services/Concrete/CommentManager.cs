@@ -15,19 +15,15 @@ using System.Threading.Tasks;
 
 namespace Blog.Services.Concrete
 {
-    public class CommentManager : ICommentService
+    public class CommentManager : ManagerBase, ICommentService
     {
-        private readonly IUnitOfWork _uow;
-        private readonly IMapper _mapper;
 
-        public CommentManager(IUnitOfWork uow, IMapper mapper)
+        public CommentManager(IUnitOfWork uow, IMapper mapper) : base(uow, mapper)
         {
-            _uow = uow;
-            _mapper = mapper;
         }
         public async Task<IDataResult<CommentDto>> GetAsync(int commentId)
         {
-            var comment = await _uow.Comments.GetAsync(c => c.Id == commentId);
+            var comment = await UnitOfWork.Comments.GetAsync(c => c.Id == commentId);
             if (comment != null)
             {
                 return new DataResult<CommentDto>(ResultStatus.Success, new CommentDto
@@ -43,11 +39,11 @@ namespace Blog.Services.Concrete
 
         public async Task<IDataResult<CommentUpdateDto>> GetCommentUpdateDtoAsync(int commentId)
         {
-            var result = await _uow.Comments.AnyAsync(c => c.Id == commentId);
+            var result = await UnitOfWork.Comments.AnyAsync(c => c.Id == commentId);
             if (result)
             {
-                var comment = await _uow.Comments.GetAsync(c => c.Id == commentId);
-                var commentUpdateDto = _mapper.Map<CommentUpdateDto>(comment);
+                var comment = await UnitOfWork.Comments.GetAsync(c => c.Id == commentId);
+                var commentUpdateDto = Mapper.Map<CommentUpdateDto>(comment);
                 return new DataResult<CommentUpdateDto>(ResultStatus.Success, commentUpdateDto);
             }
             else
@@ -58,7 +54,7 @@ namespace Blog.Services.Concrete
 
         public async Task<IDataResult<CommentListDto>> GetAllAsync()
         {
-            var comments = await _uow.Comments.GetAllAsync();
+            var comments = await UnitOfWork.Comments.GetAllAsync();
             if (comments.Count > -1)
             {
                 return new DataResult<CommentListDto>(ResultStatus.Success, new CommentListDto
@@ -74,7 +70,7 @@ namespace Blog.Services.Concrete
 
         public async Task<IDataResult<CommentListDto>> GetAllByDeletedAsync()
         {
-            var comments = await _uow.Comments.GetAllAsync(c => c.IsDeleted);
+            var comments = await UnitOfWork.Comments.GetAllAsync(c => c.IsDeleted);
             if (comments.Count > -1)
             {
                 return new DataResult<CommentListDto>(ResultStatus.Success, new CommentListDto
@@ -90,7 +86,7 @@ namespace Blog.Services.Concrete
 
         public async Task<IDataResult<CommentListDto>> GetAllByNonDeletedAsync()
         {
-            var comments = await _uow.Comments.GetAllAsync(c => !c.IsDeleted);
+            var comments = await UnitOfWork.Comments.GetAllAsync(c => !c.IsDeleted);
             if (comments.Count > -1)
             {
                 return new DataResult<CommentListDto>(ResultStatus.Success, new CommentListDto
@@ -106,7 +102,7 @@ namespace Blog.Services.Concrete
 
         public async Task<IDataResult<CommentListDto>> GetAllByNonDeletedAndActiveAsync()
         {
-            var comments = await _uow.Comments.GetAllAsync(c => !c.IsDeleted && c.IsActive);
+            var comments = await UnitOfWork.Comments.GetAllAsync(c => !c.IsDeleted && c.IsActive);
             if (comments.Count > -1)
             {
                 return new DataResult<CommentListDto>(ResultStatus.Success, new CommentListDto
@@ -122,9 +118,9 @@ namespace Blog.Services.Concrete
 
         public async Task<IDataResult<CommentDto>> AddAsync(CommentAddDto commentAddDto)
         {
-            var comment = _mapper.Map<Comment>(commentAddDto);
-            var addedComment = await _uow.Comments.AddAsync(comment);
-            await _uow.SaveAsync();
+            var comment = Mapper.Map<Comment>(commentAddDto);
+            var addedComment = await UnitOfWork.Comments.AddAsync(comment);
+            await UnitOfWork.SaveAsync();
             return new DataResult<CommentDto>(ResultStatus.Success, Messages.Comment.Add(commentAddDto.CreatedByName), new CommentDto
             {
                 Comment = addedComment,
@@ -133,11 +129,11 @@ namespace Blog.Services.Concrete
 
         public async Task<IDataResult<CommentDto>> UpdateAsync(CommentUpdateDto commentUpdateDto, string modifiedByName)
         {
-            var oldComment = await _uow.Comments.GetAsync(c => c.Id == commentUpdateDto.Id);
-            var comment = _mapper.Map<CommentUpdateDto, Comment>(commentUpdateDto, oldComment);
+            var oldComment = await UnitOfWork.Comments.GetAsync(c => c.Id == commentUpdateDto.Id);
+            var comment = Mapper.Map<CommentUpdateDto, Comment>(commentUpdateDto, oldComment);
             comment.ModifiedByName = modifiedByName;
-            var updatedComment = await _uow.Comments.UpdateAsync(comment);
-            await _uow.SaveAsync();
+            var updatedComment = await UnitOfWork.Comments.UpdateAsync(comment);
+            await UnitOfWork.SaveAsync();
             return new DataResult<CommentDto>(ResultStatus.Success, Messages.Comment.Update(comment.CreatedByName), new CommentDto
             {
                 Comment = updatedComment,
@@ -146,14 +142,14 @@ namespace Blog.Services.Concrete
 
         public async Task<IDataResult<CommentDto>> DeleteAsync(int commentId, string modifiedByName)
         {
-            var comment = await _uow.Comments.GetAsync(c => c.Id == commentId);
+            var comment = await UnitOfWork.Comments.GetAsync(c => c.Id == commentId);
             if (comment != null)
             {
                 comment.IsDeleted = true;
                 comment.ModifiedByName = modifiedByName;
                 comment.ModifiedDate = DateTime.Now;
-                var deletedComment = await _uow.Comments.UpdateAsync(comment);
-                await _uow.SaveAsync();
+                var deletedComment = await UnitOfWork.Comments.UpdateAsync(comment);
+                await UnitOfWork.SaveAsync();
                 return new DataResult<CommentDto>(ResultStatus.Success, Messages.Comment.Delete(deletedComment.CreatedByName), new CommentDto
                 {
                     Comment = deletedComment,
@@ -167,18 +163,18 @@ namespace Blog.Services.Concrete
 
         public async Task<IResult> HardDeleteAsync(int commentId)
         {
-            var comment = await _uow.Comments.GetAsync(c => c.Id == commentId);
+            var comment = await UnitOfWork.Comments.GetAsync(c => c.Id == commentId);
             if (comment != null)
             {
-                await _uow.Comments.DeleteAsync(comment);
-                await _uow.SaveAsync();
+                await UnitOfWork.Comments.DeleteAsync(comment);
+                await UnitOfWork.SaveAsync();
                 return new Result(ResultStatus.Success, Messages.Comment.HardDelete(comment.CreatedByName));
             }
             return new Result(ResultStatus.Error, Messages.Comment.NotFound(isPlural: false));
         }
         public async Task<IDataResult<int>> CountAsync()
         {
-            var commentCount = await _uow.Comments.CountAsync();
+            var commentCount = await UnitOfWork.Comments.CountAsync();
             if (commentCount > -1)
             {
                 return new DataResult<int>(ResultStatus.Success, commentCount);
@@ -191,7 +187,7 @@ namespace Blog.Services.Concrete
 
         public async Task<IDataResult<int>> CountByNonDeletedAsync()
         {
-            var commentCount = await _uow.Comments.CountAsync(c => !c.IsDeleted);
+            var commentCount = await UnitOfWork.Comments.CountAsync(c => !c.IsDeleted);
             if (commentCount > -1)
             {
                 return new DataResult<int>(ResultStatus.Success, commentCount);

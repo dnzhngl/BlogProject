@@ -15,24 +15,22 @@ using System.Threading.Tasks;
 
 namespace Blog.Services.Concrete
 {
-    public class ArticleManager : IArticleService
+    public class ArticleManager : ManagerBase, IArticleService
     {
-        private readonly IUnitOfWork _uow;
-        private readonly IMapper _mapper;
-        public ArticleManager(IUnitOfWork uow, IMapper mapper)
+
+        public ArticleManager(IUnitOfWork uow, IMapper mapper) : base(uow, mapper)
         {
-            _uow = uow;
-            _mapper = mapper;
+
         }
 
         public async Task<IDataResult<ArticleDto>> AddAsync(ArticleAddDto articleAddDto, string createdByName, int userId)
         {
-            var article = _mapper.Map<Article>(articleAddDto);
+            var article = Mapper.Map<Article>(articleAddDto);
             article.CreatedByName = createdByName;
             article.ModifiedByName = createdByName;
             article.UserId = userId;
-            var addedArticle = await _uow.Articles.AddAsync(article);
-            await _uow.SaveAsync();
+            var addedArticle = await UnitOfWork.Articles.AddAsync(article);
+            await UnitOfWork.SaveAsync();
 
             return new DataResult<ArticleDto>(ResultStatus.Success, Messages.Article.Add(addedArticle.Title), new ArticleDto
             {
@@ -44,7 +42,7 @@ namespace Blog.Services.Concrete
 
         public async Task<IDataResult<int>> CountAsync()
         {
-            var articlesCount = await _uow.Articles.CountAsync();
+            var articlesCount = await UnitOfWork.Articles.CountAsync();
             if (articlesCount > -1)
             {
                 return new DataResult<int>(ResultStatus.Success, articlesCount);
@@ -57,7 +55,7 @@ namespace Blog.Services.Concrete
 
         public async Task<IDataResult<int>> CountByNonDeletedAsync()
         {
-            var articlesCount = await _uow.Articles.CountAsync(a => !a.IsDeleted);
+            var articlesCount = await UnitOfWork.Articles.CountAsync(a => !a.IsDeleted);
             if (articlesCount > -1)
             {
                 return new DataResult<int>(ResultStatus.Success, articlesCount);
@@ -70,16 +68,16 @@ namespace Blog.Services.Concrete
 
         public async Task<IResult> DeleteAsync(int articleId, string modifiedByName)
         {
-            var result = await _uow.Articles.AnyAsync(a => a.Id == articleId);
+            var result = await UnitOfWork.Articles.AnyAsync(a => a.Id == articleId);
             if (result)
             {
-                var article = await _uow.Articles.GetAsync(a => a.Id == articleId);
+                var article = await UnitOfWork.Articles.GetAsync(a => a.Id == articleId);
                 article.IsDeleted = true;
                 article.IsActive = false;
                 article.ModifiedByName = modifiedByName;
                 article.ModifiedDate = DateTime.Now;
-                await _uow.Articles.UpdateAsync(article);
-                await _uow.SaveAsync();
+                await UnitOfWork.Articles.UpdateAsync(article);
+                await UnitOfWork.SaveAsync();
 
                 return new Result(ResultStatus.Success, Messages.Article.Delete(article.Title));
             }
@@ -88,7 +86,7 @@ namespace Blog.Services.Concrete
 
         public async Task<IDataResult<ArticleDto>> GetAsync(int articleId)
         {
-            var article = await _uow.Articles.GetAsync(a => a.Id == articleId, a => a.Category, a => a.User);
+            var article = await UnitOfWork.Articles.GetAsync(a => a.Id == articleId, a => a.Category, a => a.User);
             if (article != null)
             {
                 return new DataResult<ArticleDto>(ResultStatus.Success, new ArticleDto
@@ -107,7 +105,7 @@ namespace Blog.Services.Concrete
 
         public async Task<IDataResult<ArticleListDto>> GetAllAsync()
         {
-            var articles = await _uow.Articles.GetAllAsync(null, a => a.User, a => a.Category);
+            var articles = await UnitOfWork.Articles.GetAllAsync(null, a => a.User, a => a.Category);
             if (articles.Count > -1)
             {
                 return new DataResult<ArticleListDto>(ResultStatus.Success, new ArticleListDto
@@ -121,10 +119,10 @@ namespace Blog.Services.Concrete
 
         public async Task<IDataResult<ArticleListDto>> GetAllByCategoryAsync(int categoryId)
         {
-            var result = await _uow.Categories.AnyAsync(c => c.Id == categoryId);
+            var result = await UnitOfWork.Categories.AnyAsync(c => c.Id == categoryId);
             if (result)
             {
-                var articles = await _uow.Articles.GetAllAsync(a => a.CategoryId == categoryId && !a.IsDeleted && a.IsActive, a => a.User, a => a.Category);
+                var articles = await UnitOfWork.Articles.GetAllAsync(a => a.CategoryId == categoryId && !a.IsDeleted && a.IsActive, a => a.User, a => a.Category);
                 if (articles.Count > -1)
                 {
                     return new DataResult<ArticleListDto>(ResultStatus.Success, new ArticleListDto
@@ -140,7 +138,7 @@ namespace Blog.Services.Concrete
 
         public async Task<IDataResult<ArticleListDto>> GetAllByNonDeletedAsync()
         {
-            var articles = await _uow.Articles.GetAllAsync(a => !a.IsDeleted, a => a.User, a => a.Category);
+            var articles = await UnitOfWork.Articles.GetAllAsync(a => !a.IsDeleted, a => a.User, a => a.Category);
             if (articles.Count > -1)
             {
                 return new DataResult<ArticleListDto>(ResultStatus.Success, new ArticleListDto
@@ -154,7 +152,7 @@ namespace Blog.Services.Concrete
 
         public async Task<IDataResult<ArticleListDto>> GetAllByNonDeletedAndActiveAsync()
         {
-            var articles = await _uow.Articles.GetAllAsync(a => !a.IsDeleted && a.IsActive, a => a.User, a => a.Category);
+            var articles = await UnitOfWork.Articles.GetAllAsync(a => !a.IsDeleted && a.IsActive, a => a.User, a => a.Category);
             if (articles.Count > -1)
             {
                 return new DataResult<ArticleListDto>(ResultStatus.Success, new ArticleListDto
@@ -168,12 +166,12 @@ namespace Blog.Services.Concrete
 
         public async Task<IResult> HardDeleteAsync(int articleId)
         {
-            var result = await _uow.Articles.AnyAsync(a => a.Id == articleId);
+            var result = await UnitOfWork.Articles.AnyAsync(a => a.Id == articleId);
             if (result)
             {
-                var article = await _uow.Articles.GetAsync(a => a.Id == articleId);
-                await _uow.Articles.DeleteAsync(article);
-                await _uow.SaveAsync();
+                var article = await UnitOfWork.Articles.GetAsync(a => a.Id == articleId);
+                await UnitOfWork.Articles.DeleteAsync(article);
+                await UnitOfWork.SaveAsync();
 
                 return new Result(ResultStatus.Success, Messages.Article.HardDelete(article.Title));
             }
@@ -182,11 +180,11 @@ namespace Blog.Services.Concrete
 
         public async Task<IDataResult<ArticleDto>> UpdateAsync(ArticleUpdateDto articleUpdateDto, string modifiedByName)
         {
-            var oldArticle = await _uow.Articles.GetAsync(a => a.Id == articleUpdateDto.Id);
-            var article = _mapper.Map<ArticleUpdateDto, Article>(articleUpdateDto, oldArticle);
+            var oldArticle = await UnitOfWork.Articles.GetAsync(a => a.Id == articleUpdateDto.Id);
+            var article = Mapper.Map<ArticleUpdateDto, Article>(articleUpdateDto, oldArticle);
             article.ModifiedByName = modifiedByName;
-            var updatedArticle = await _uow.Articles.UpdateAsync(article);
-            await _uow.SaveAsync();
+            var updatedArticle = await UnitOfWork.Articles.UpdateAsync(article);
+            await UnitOfWork.SaveAsync();
 
             return new DataResult<ArticleDto>(ResultStatus.Success, Messages.Article.Update(updatedArticle.Title), new ArticleDto
             {
@@ -198,11 +196,11 @@ namespace Blog.Services.Concrete
 
         public async Task<IDataResult<ArticleUpdateDto>> GetArticleUpdateDtoAsync(int articleId)
         {
-            var result = await _uow.Articles.AnyAsync(c => c.Id == articleId);
+            var result = await UnitOfWork.Articles.AnyAsync(c => c.Id == articleId);
             if (result)
             {
-                var article = await _uow.Articles.GetAsync(c => c.Id == articleId);
-                var articleUpdateDto = _mapper.Map<ArticleUpdateDto>(article);
+                var article = await UnitOfWork.Articles.GetAsync(c => c.Id == articleId);
+                var articleUpdateDto = Mapper.Map<ArticleUpdateDto>(article);
                 return new DataResult<ArticleUpdateDto>(ResultStatus.Success, articleUpdateDto);
             }
             return new DataResult<ArticleUpdateDto>(ResultStatus.Error, Messages.Article.NotFound(isPlural: false), null);
