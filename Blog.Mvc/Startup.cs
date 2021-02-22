@@ -50,8 +50,8 @@ namespace Blog.Mvc
             // Cookie işlemleri - ConfigureApplication cookie servisini kullanacağız. Ayarlarını lambda ile giriyoruz.
             services.ConfigureApplicationCookie(options =>
             {       // Projemizde sadece Admin area'ya kullanıcı girişi yapılacağı için adreslerimiz admin area içerisinde yer alıyor.
-                options.LoginPath = new PathString("/Admin/User/Login");     // LoginPath = Login işlemlerini gerçekleştireceğimiz sayfanın adresi
-                options.LogoutPath = new PathString("/Admin/User/Logout");   // LogoutPath = Logout işlemlerini gerçekleştireceğimiz sayfanın adresi
+                options.LoginPath = new PathString("/Admin/Auth/Login");     // LoginPath = Login işlemlerini gerçekleştireceğimiz sayfanın adresi
+                options.LogoutPath = new PathString("/Admin/Auth/Logout");   // LogoutPath = Logout işlemlerini gerçekleştireceğimiz sayfanın adresi
                 
                 // Cookie ayarlarını burada giriyoruz.
                 options.Cookie = new CookieBuilder
@@ -66,7 +66,7 @@ namespace Blog.Mvc
 
                 options.SlidingExpiration = true; // Kullanıcı sitemize giriş yaptıktan sonra zaman kullanıcıya bir zaman tanıyoruz. Bu süre içerisinde kullanıcı tekrardan giriş yaparsa tanınan zaman başa sarar. 
                 options.ExpireTimeSpan = System.TimeSpan.FromDays(7);  // Kullanıcıya verilen cookie bilgileri 7 gün boyunca etkili olacak tarayıcı üzerinde. 7 gün içerisinde giriş yapmaz ise cookie bilgileri geçersiz olacak.
-                options.AccessDeniedPath = new PathString("/Admin/User/AccessDenied");  // Kullanıcı sisteme giriş yapmış ama yetkisi olmayan bir sayfaya erişmeye çalıştığında kullanıcıyı hangi sayfaya yönlendireceğini veriyorsun.
+                options.AccessDeniedPath = new PathString("/Admin/Auth/AccessDenied");  // Kullanıcı sisteme giriş yapmış ama yetkisi olmayan bir sayfaya erişmeye çalıştığında kullanıcıyı hangi sayfaya yönlendireceğini veriyorsun.
             });
         }
 

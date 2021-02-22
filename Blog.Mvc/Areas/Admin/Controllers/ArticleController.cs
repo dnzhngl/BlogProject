@@ -6,6 +6,7 @@ using Blog.Mvc.Areas.Admin.Models;
 using Blog.Mvc.Helpers.Abstract;
 using Blog.Services.Abstract;
 using Blog.Shared.Utilities.Results.ComplexTypes;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NToastNotify;
@@ -39,6 +40,7 @@ namespace Blog.Mvc.Areas.Admin.Controllers
             #endregion
         }
 
+        [Authorize(Roles = "SuperAdmin, Article.Read")]
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -49,6 +51,8 @@ namespace Blog.Mvc.Areas.Admin.Controllers
             }
             return NotFound();
         }
+
+        [Authorize(Roles = "SuperAdmin, Article.Create")]
         [HttpGet]
         public async Task<IActionResult> Add()
         {
@@ -62,6 +66,7 @@ namespace Blog.Mvc.Areas.Admin.Controllers
             }
             return NotFound();
         }
+        [Authorize(Roles = "SuperAdmin, Article.Create")]
         [HttpPost]
         public async Task<IActionResult> Add(ArticleAddViewModel articleAddViewModel)
         {
@@ -91,6 +96,8 @@ namespace Blog.Mvc.Areas.Admin.Controllers
             articleAddViewModel.Categories = categories.Data.Categories;
             return View(articleAddViewModel);
         }
+
+        [Authorize(Roles = "SuperAdmin, Article.Update")]
         [HttpGet]
         public async Task<IActionResult> Update(int articleId)
         {
@@ -104,7 +111,7 @@ namespace Blog.Mvc.Areas.Admin.Controllers
             }
             return NotFound();
         }
-
+        [Authorize(Roles = "SuperAdmin, Article.Update")]
         [HttpPost]
         public async Task<IActionResult> Update(ArticleUpdateViewModel articleUpdateViewModel)
         {
@@ -149,6 +156,7 @@ namespace Blog.Mvc.Areas.Admin.Controllers
             return View(articleUpdateViewModel);
         }
 
+        [Authorize(Roles = "SuperAdmin, Article.Delete")]
         [HttpPost]
         public async Task<JsonResult> Delete(int articleId)
         {
@@ -157,6 +165,7 @@ namespace Blog.Mvc.Areas.Admin.Controllers
             return Json(articleResult);
         }
 
+        [Authorize(Roles = "SuperAdmin, Article.Read")]
         [HttpGet]
         public async Task<JsonResult> GetAllArticles()
         {

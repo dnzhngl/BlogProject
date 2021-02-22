@@ -10,6 +10,7 @@
                     Yönetim Paneli
                 </a>
                 <div class="sb-sidenav-menu-heading">İÇERİK İŞLEMLERİ</div>
+
                 <a class="nav-link" asp-area="Admin" asp-controller="Category" asp-action="Index">
                     <div class="sb-nav-link-icon"><i class="fas fa-th-list"></i></div>
                     Kategoriler
@@ -22,20 +23,25 @@
                     <div class="sb-nav-link-icon"><i class="fas fa-comments"></i></div>
                     Yorumlar
                 </a>
-                @if(Model.Roles.Any(r => r.Equals("Admin")))
+
+                <div class="sb-sidenav-menu-heading">KULLANICI İŞLEMLERİ</div>
+
+                @if (Model.Roles.Any(r => r.Equals("SuperAdmin") || r.Equals("Role.Read")))
                 {
-                    <div class="sb-sidenav-menu-heading">KULLANICI İŞLEMLERİ</div>
                     <a class="nav-link" asp-area="Admin" asp-controller="Role" asp-action="Index">
                         <div class="sb-nav-link-icon"><i class="fas fa-user-shield"></i></div>
                         Roller
                     </a>
+                 }
+                @if (Model.Roles.Any(r => r.Equals("SuperAdmin") || r.Equals("User.Read")))
+                {
                     <a class="nav-link" asp-area="Admin" asp-controller="User" asp-action="Index">
                         <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
                         Kullanıcılar
                     </a>
-                 }
+                }
 
-            </div>
+             </div>
         </div>
         <div class="sb-sidenav-footer">
             <div class="small">Giriş Yapan Kullanıcı:</div>

@@ -19,7 +19,6 @@ using Blog.Mvc.Helpers.Abstract;
 namespace Blog.Mvc.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin, Editor")]
     public class CategoryController : BaseController
     {
         private readonly ICategoryService _categoryService;
@@ -29,19 +28,20 @@ namespace Blog.Mvc.Areas.Admin.Controllers
             _categoryService = categoryService;
         }
 
-
+        [Authorize(Roles = "SuperAdmin, Category.Read")]
         public async Task<IActionResult> Index()
         {
             var result = await _categoryService.GetAllByNonDeletedAsync();
             return View(result.Data);
         }
 
-
+        [Authorize(Roles = "SuperAdmin, Category.Create")]
         [HttpGet]
         public IActionResult Add()
         {
             return PartialView("_CategoryAddPartial");
         }
+        [Authorize(Roles = "SuperAdmin, Category.Create")]
         [HttpPost]
         public async Task<IActionResult> Add(CategoryAddDto categoryAddDto)
         {
@@ -72,6 +72,7 @@ namespace Blog.Mvc.Areas.Admin.Controllers
             return Json(categoryAddAjaxErrorModel);
         }
 
+        [Authorize(Roles = "SuperAdmin, Category.Read")]
         public async Task<JsonResult> GetAllCategories()
         {
             var result = await _categoryService.GetAllByNonDeletedAsync();
@@ -82,6 +83,7 @@ namespace Blog.Mvc.Areas.Admin.Controllers
             return Json(categories);
         }
 
+        [Authorize(Roles = "SuperAdmin, Category.Delete")]
         [HttpPost]
         public async Task<JsonResult> Delete(int categoryId) //CategoryId Jquery ile post ettiğimizde butona vermiş olduğumuz data-id attributeu sayesinde buraya gönderilecek.
         {
@@ -90,6 +92,7 @@ namespace Blog.Mvc.Areas.Admin.Controllers
             return Json(deletedCategory);
         }
 
+        [Authorize(Roles = "SuperAdmin, Category.Update")]
         [HttpGet]
         public async Task<IActionResult> Update(int categoryId)
         {
@@ -100,6 +103,7 @@ namespace Blog.Mvc.Areas.Admin.Controllers
             }
             return NotFound();
         }
+        [Authorize(Roles = "SuperAdmin, Category.Update")]
         [HttpPost]
         public async Task<IActionResult> Update(CategoryUpdateDto categoryUpdateDto)
         {

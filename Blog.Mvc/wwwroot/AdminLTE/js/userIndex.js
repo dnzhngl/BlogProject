@@ -50,12 +50,17 @@
                                         user.Id,
                                         user.UserName,
                                         user.Email,
+                                        user.FirstName,
+                                        user.LastName,
                                         user.PhoneNumber,
+                                        user.About.length > 75 ? user.About.substring(0, 75) : user.About,
                                         `<img src="/img/userImg/${user.Picture}" class="my-image-table" alt="${user.UserName}" />`,
                                         `
+                                         <button class="btn btn-info btn-sm btn-detail" data-id="${user.Id}"><span class="fas fa-newspaper"></span></button>
+                                         <button class="btn btn-warning btn-sm btn-assign" data-id="${user.Id}"><span class="fas fa-user-shield"></span></button>
                                          <button class="btn btn-warning btn-sm btn-update" data-id="${user.Id}"><span class="fas fa-edit"></span></button>
                                          <button class="btn btn-danger btn-sm btn-delete" data-id="${user.Id}"><span class="fas fa-minus-circle"></span></button>
-                                         `
+                                        `
                                     ]).node(); // newTableRow = o an eklenmiş olan row'umuz oluyor.
 
                                     const jqueryTableRow = $(newTableRow);
@@ -277,11 +282,16 @@
                             userAddAjaxModel.UserDto.User.Id,
                             userAddAjaxModel.UserDto.User.UserName,
                             userAddAjaxModel.UserDto.User.Email,
+                            userAddAjaxModel.UserDto.User.FirstName,
+                            userAddAjaxModel.UserDto.User.LastName,
                             userAddAjaxModel.UserDto.User.PhoneNumber,
+                            userAddAjaxModel.UserDto.User.About.length > 75 ? userAddAjaxModel.UserDto.User.About.substring(0, 75) : userAddAjaxModel.UserDto.User.About,
                             `   <img src="/img/userImg/${userAddAjaxModel.UserDto.User.Picture}" class="my-image-table" alt="${userAddAjaxModel.UserDto.User.UserName}" />`,
                             `
-                                <button class="btn btn-warning btn-sm btn-update" data-id="${userAddAjaxModel.UserDto.User.Id}"><span class="fas fa-edit"></span></button>
-                                <button class="btn btn-danger btn-sm btn-delete" data-id="${userAddAjaxModel.UserDto.User.Id}"><span class="fas fa-minus-circle"></span></button>
+                             <button class="btn btn-info btn-sm btn-detail" data-id="${userAddAjaxModel.UserDto.User.Id}"><span class="fas fa-newspaper"></span></button>
+                             <button class="btn btn-warning btn-sm btn-assign" data-id="${userAddAjaxModel.UserDto.User.Id}"><span class="fas fa-user-shield"></span></button>
+                             <button class="btn btn-warning btn-sm btn-update" data-id="${userAddAjaxModel.UserDto.User.Id}"><span class="fas faedit"><span><button>
+                             <button class="btn btn-danger btn-sm btn-delete" data-id="${userAddAjaxModel.UserDto.User.Id}"><span class="fas fa-minus-circle"></span></button>
                             `
                         ]).node(); // buradaki table row'u bir değişkene atayabilmek, table row olarak seçebilmek için node() kullanmamız gerek.
                         // önceden- .draw() işlemi burada girmiş olduğumuz bilgilerin ekranda çizilmesini yani ekrana yazılmasını sağlıyor.
@@ -446,9 +456,14 @@
                             userUpdateAjaxModel.UserDto.User.Id,
                             userUpdateAjaxModel.UserDto.User.UserName,
                             userUpdateAjaxModel.UserDto.User.Email,
+                            userUpdateAjaxModel.UserDto.User.FirstName,
+                            userUpdateAjaxModel.UserDto.User.LastName,
                             userUpdateAjaxModel.UserDto.User.PhoneNumber,
+                            userUpdateAjaxModel.UserDto.User.About.length > 75 ? userUpdateAjaxModel.UserDto.User.About.substring(0, 75) : userUpdateAjaxModel.UserDto.User.About,
                             `   <img src="/img/userImg/${userUpdateAjaxModel.UserDto.User.Picture}" class="my-image-table" alt="${userUpdateAjaxModel.UserDto.User.UserName}" />`,
                             `
+                                <button class="btn btn-info btn-sm btn-detail" data-id="${userUpdateAjaxModel.UserDto.User.Id}"><span class="fas fa-newspaper"></span></button>
+                                <button class="btn btn-warning btn-sm btn-assign" data-id="${userUpdateAjaxModel.UserDto.User.Id}"><span class="fas fa-user-shield"></span></button>
                                 <button class="btn btn-warning btn-sm btn-update" data-id="${userUpdateAjaxModel.UserDto.User.Id}"><span class="fas fa-edit"></span></button>
                                 <button class="btn btn-danger btn-sm btn-delete" data-id="${userUpdateAjaxModel.UserDto.User.Id}"><span class="fas fa-minus-circle"></span></button>
                             `
@@ -456,10 +471,10 @@
                         tableRow.attr("name", `${id}`); //tableRow'a name attribute'nu ve id değerini ekliyoruz.
                         dataTable.row(tableRow).invalidate(); //invalidate sayesinde vermiş olduğumuz rowun değiştiğini belirtiyoruz. Bu durumda dataTable bu rowdaki verileri kontorl edip değişikliği yapıyor.
 
-                       toastr.success(`${userUpdateAjaxModel.UserDto.Message}`, 'Başarılı İşlem!');
+                        toastr.success(`${userUpdateAjaxModel.UserDto.Message}`, 'Başarılı İşlem!');
                     } else {
                         let summaryText = "";
-                        
+
                         $('#validation-summary > ul > li').each(function () {
                             let text = $(this).text();
                             summaryText = `* ${text}\n`;
@@ -474,5 +489,26 @@
             });
         });
         // Ajax POST / Updating the FormData as UserUpdateDto ends here. 
+    });
+
+
+    // Get Detail Ajax Operation
+    $(function () {
+
+        const url = '/Admin/User/GetDetail/';
+        const placeHolderDiv = $('#modalPlaceHolder');
+        $(document).on('click',
+            '.btn-detail',
+            function (event) {
+                event.preventDefault();
+                const id = $(this).attr('data-id');
+                $.get(url, { userId: id }).done(function (data) {
+                    placeHolderDiv.html(data);
+                    placeHolderDiv.find('.modal').modal('show');
+                }).fail(function (err) {
+                    toastr.error(`${err.responseText}`, 'Hata!');
+                });
+            });
+
     });
 });
